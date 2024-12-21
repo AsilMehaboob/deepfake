@@ -9,3 +9,4 @@ h5py
 efficientnet
 split_folders
 flask
+flask-cors
