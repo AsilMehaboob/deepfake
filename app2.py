@@ -10,9 +10,9 @@ app = Flask(__name__)
 
 CORS(app, resources={
     r"/*": {
-        "origins": "*",
-        "methods": ["POST"],
-        "allow_headers": ["Content-Type", "Authorization"]
+        "origins": "*",  # Allow all origins
+        "methods": ["POST"],  # Only allow POST requests
+        "allow_headers": ["Content-Type", "Authorization"]  # Include necessary headers
     }
 })
 
@@ -28,9 +28,6 @@ except Exception as e:
 
 # Function to preprocess a frame or image
 def preprocess_frame(frame):
-    """
-    Resize and normalize the frame for model prediction.
-    """
     try:
         frame_resized = cv2.resize(frame, (128, 128))
         frame_normalized = img_to_array(frame_resized) / 255.0
@@ -40,19 +37,13 @@ def preprocess_frame(frame):
 
 # Analyze predictions
 def analyze_predictions(predictions):
-    """
-    Process prediction results to determine classification.
-    """
-    predictions_np = np.array(predictions, dtype=np.float64)
-    best_prediction = float(max(predictions_np))
+    predictions_np = np.array(predictions, dtype=np.float64)  # Ensure float64 for JSON compatibility
+    best_prediction = float(max(predictions_np))  # Convert to native float
     classification = 'Real' if best_prediction < 0.4 else 'Fake'
     return predictions_np, best_prediction, classification
 
 # Process video and classify frames
 def classify_video(video_path, model, num_frames=20):
-    """
-    Extract frames from a video and classify them using the model.
-    """
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         raise RuntimeError(f"Unable to open video file: {video_path}")
@@ -69,7 +60,7 @@ def classify_video(video_path, model, num_frames=20):
         if frame_idx % frame_interval == 0:
             try:
                 preprocessed_frame = preprocess_frame(frame)
-                prediction = float(model.predict(preprocessed_frame, verbose=0)[0][0])
+                prediction = float(model.predict(preprocessed_frame, verbose=0)[0][0])  # Convert to native float
                 predictions.append(prediction)
             except Exception as e:
                 print(f"Error predicting frame at index {frame_idx}: {e}")
@@ -80,24 +71,18 @@ def classify_video(video_path, model, num_frames=20):
 
 # Process photo and classify
 def classify_photo(photo_path, model):
-    """
-    Classify a single photo using the model.
-    """
     try:
         frame = cv2.imread(photo_path)
         if frame is None:
             raise FileNotFoundError(f"Unable to read image: {photo_path}")
         preprocessed_frame = preprocess_frame(frame)
-        prediction = float(model.predict(preprocessed_frame, verbose=0)[0][0])
+        prediction = float(model.predict(preprocessed_frame, verbose=0)[0][0])  # Convert to native float
         return [prediction]
     except Exception as e:
         raise RuntimeError(f"Error processing image: {e}")
 
 @app.route('/classify', methods=['POST'])
 def classify():
-    """
-    Handle classification requests for uploaded images or videos.
-    """
     file = request.files.get('image')
     if not file:
         return jsonify({"error": "No file uploaded"}), 400
@@ -116,7 +101,7 @@ def classify():
         predictions_np, best_prediction, classification = analyze_predictions(predictions)
 
         return jsonify({
-            "predictions": predictions_np.tolist(),
+            "predictions": predictions_np.tolist(),  # Convert NumPy array to list
             "best_prediction": best_prediction,
             "classification": classification
         })
