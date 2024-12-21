@@ -72,7 +72,7 @@ def classify_video(video_path, model, num_frames=20):
 # Process photo and classify
 def classify_photo(photo_path, model):
     try:
-        frame = cv2.imread(photo_path)
+        cv2.imread(photo_path)
         if frame is None:
             raise FileNotFoundError(f"Unable to read image: {photo_path}")
         preprocessed_frame = preprocess_frame(frame)
@@ -83,7 +83,7 @@ def classify_photo(photo_path, model):
 
 @app.route('/classify', methods=['POST'])
 def classify():
-    file = request.files.get('image')
+    file = request.files.get('mediaFile')
     if not file:
         return jsonify({"error": "No file uploaded"}), 400
 
