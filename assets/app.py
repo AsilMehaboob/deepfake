@@ -6,7 +6,7 @@ import os
 
 # Paths to model and media
 MODEL_PATH = 'cnn_model.h5'
-MEDIA_PATH = './assets/asilreal.jpg'  # Change this to your file
+MEDIA_PATH = './assets/sample.mp4'  # Change this to your file
 
 # Validate paths
 def validate_file_path(path, file_type):
