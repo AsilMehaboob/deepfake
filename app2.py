@@ -39,7 +39,7 @@ def preprocess_frame(frame):
 def analyze_predictions(predictions):
     predictions_np = np.array(predictions, dtype=np.float64)  # Ensure float64 for JSON compatibility
     best_prediction = float(max(predictions_np))  # Convert to native float
-    classification = 'Real' if best_prediction > 0.4 else 'Fake'
+    classification = 'Real' if best_prediction < 0.4 else 'Fake'
     return predictions_np, best_prediction, classification
 
 # Process video and classify frames
